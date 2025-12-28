@@ -1,62 +1,68 @@
 import streamlit as st
 import pandas as pd
 import requests
+import time
 
-# Backend címe
-URL = "http://127.0.0.1:8000"
+# URL = "http://127.0.0.1:8000"  
+URL = "https://lfckw8-multi-beadand.onrender.com"
 
-st.title("Bitcoin Árfolyamfigyelő")
+st.set_page_config(page_title="Kripto Figyelő", layout="wide")
 
-# Frissítés gomb oldalt
-st.sidebar.write("Vezérlőpult")
-if st.sidebar.button("Frissítés"):
+st.title(" Bitcoin Árfolyamfigyelő")
+
+st.sidebar.header("Vezérlőpult")
+if st.sidebar.button("Frissítés most"):
     st.rerun()
 
+st.sidebar.caption(f"Utolsó frissítés: {time.strftime('%H:%M:%S')}")
+
 try:
-    # Adatok lekérése a szerverről
+  
     res = requests.get(f"{URL}/adatok/")
     statisztika_res = requests.get(f"{URL}/statisztika/")
     
-    # Ha minden oké
+ 
     if res.status_code == 200 and statisztika_res.status_code == 200:
         lista = res.json()
         stat = statisztika_res.json()
         
         if len(lista) > 0:
-            # Pandas dataframe készítése
+   
             df = pd.DataFrame(lista)
             
-            # Időformátum javítása, hogy szép legyen a grafikonon
-            df["rogzites_ideje"] = pd.to_datetime(df["rogzites_ideje"])
+            if "rogzites_ideje" in df.columns:
+                df["rogzites_ideje"] = pd.to_datetime(df["rogzites_ideje"])
             
-            # Legfrissebb ár kiszedése
-            mostani_ar = df.iloc[0]["aktualis_ar"]
+            mostani_ar = df.iloc[0].get("aktualis_ar", 0)
             
-            # Kártyák kirajzolása (Metrics)
             k1, k2, k3 = st.columns(3)
-            k1.metric("Aktuális ár", f"{mostani_ar:,.0f} Ft")
-            k2.metric("Átlag (teljes)", f"{stat['atlag_ar_huf']:,.0f} Ft")
             
-            # Itt látszik a backend szűrése
-            szurt_szam = stat.get("20m_feletti_meresek_szama", 0)
-            k3.metric("Magas árfolyamok (>28.8M)", f"{szurt_szam} db")
+            k1.metric("Aktuális ár", f"{mostani_ar:,.0f} Ft")
+            
+            atlag = stat.get("atlag_ar", 0)
+            k2.metric("Átlag ár", f"{atlag:,.0f} Ft")
+            
+            magas_db = stat.get("magas_aruak_szama", stat.get("dragak_szama", 0))
+            k3.metric("Drága mérések", f"{magas_db} db")
             
             st.divider()
             
-            # Grafikon
             st.subheader("Árfolyam alakulása")
-            chart_data = df.set_index("rogzites_ideje")["aktualis_ar"]
-            st.line_chart(chart_data)
-            
-            # Táblázat a végére
-            st.write("Részletes adatok:")
-            st.dataframe(df)
-            
-        else:
-            st.info("Még nincs adat, várj kicsit...")
-            
-    else:
-        st.error("Hiba a szerver kommunikációban.")
+            if "aktualis_ar" in df.columns and "rogzites_ideje" in df.columns:
 
-except:
-    st.warning("Nem érem el a szervert. Fut a backend?")
+                chart_data = df.set_index("rogzites_ideje")["aktualis_ar"]
+                st.line_chart(chart_data)
+            else:
+                st.warning("Hiányzó adatok a grafikonhoz.")
+            
+            with st.expander("Részletes táblázat megtekintése"):
+                st.dataframe(df, use_container_width=True)
+        else:
+            st.info("A szerver elérhető, de még nincs adat az adatbázisban. Várj, amíg a scraper dolgozik!")           
+    else:
+        st.error(f"Hiba a szerver válaszában! Kód: {res.status_code}")
+
+except requests.exceptions.ConnectionError:
+    st.error("Nem érem el a szervert!")
+except Exception as e:
+    st.error(f"Váratlan hiba történt a kódban: {e}")
