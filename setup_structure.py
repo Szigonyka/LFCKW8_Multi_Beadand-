@@ -1,6 +1,6 @@
 import os
 
-# A projekt szerkezete
+
 folders = [
     "backend",
     "backend/services",
@@ -10,39 +10,38 @@ folders = [
 
 files = [
     "backend/__init__.py",
-    "backend/main.py",      # Itt indul a szerver
-    "backend/database.py",  # Adatbázis kapcsolat
-    "backend/models.py",    # Adatbázis táblák
-    "backend/schemas.py",   # Adatellenőrzés
-    "backend/crud.py",      # Adatbázis műveletek
+    "backend/main.py",      
+    "backend/database.py",  
+    "backend/models.py",    
+    "backend/schemas.py",   
+    "backend/crud.py",      
     "backend/services/__init__.py",
-    "backend/services/scraper.py", # Háttérfolyamat
+    "backend/services/scraper.py", 
     "frontend/__init__.py",
-    "frontend/app.py",      # Streamlit kód
-    "tests/__init__.py",
-    "tests/test_main.py",   # Tesztek
-    ".env",                 # Jelszavaknak
-    ".gitignore",           # GitHub-hoz
-    "README.md",            # Leírás
-    "requirements.txt",     # Csomaglista
+    "frontend/app.py",      
+    "tests/test_main.py",   
+    ".env",                 
+    ".gitignore",           
+    "README.md",            
+    "requirements.txt",     
 ]
 
-# Mappák létrehozása
+
 print(" Mappák létrehozása...")
 for folder in folders:
     os.makedirs(folder, exist_ok=True)
     print(f"   - {folder} kész.")
 
-# Fájlok létrehozása
+
 print("\nFájlok létrehozása...")
 for file in files:
-    # Ha a fájl nem létezik, létrehozzuk
+    
     if not os.path.exists(file):
         with open(file, 'w') as f:
             pass 
     print(f"   - {file} kész.")
 
-# .gitignore tartalmának beírása
+
 gitignore_content = """
 venv/
 __pycache__/

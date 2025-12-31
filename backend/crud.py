@@ -1,8 +1,6 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
 
-# Fájl: backend/crud.py (csak ezt a függvényt cseréld)
-
 def get_osszes_adat(db: Session, limit: int = 100):
     return db.query(models.KriptoAdat).order_by(models.KriptoAdat.rogzites_ideje.desc()).limit(limit).all()
 

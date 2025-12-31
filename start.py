@@ -1,42 +1,35 @@
-import sys
 import subprocess
 import time
+import sys
 import os
 
-def main():
-    print("Rendszer indítása")
+def start_system():
+    python_exe = sys.executable
+    print(f"Rendszer indítása")
+    print(f"Python: {python_exe}\n")
 
-    python_cmd = sys.executable 
-    
-    print(f"(BACKEND) Inditas ezzel a paranccsal: {python_cmd} -m uvicorn")
-    backend_process = subprocess.Popen(
-        [python_cmd, "-m", "uvicorn", "backend.main:app", "--reload"]
-    )
-
-    time.sleep(3)
-
-    print("(FRONTEND) Streamlit inditasa")
-    frontend_process = subprocess.Popen(
-        [python_cmd, "-m", "streamlit", "run", "frontend/app.py"]
-    )
-
-    print("\n Mindket szolgaltatas fut.")
-
+    # 1. Backend indítása
+    print("1. Backend indítása")
     try:
-       
-        while True:
-            time.sleep(1)
-           
-            if backend_process.poll() is not None or frontend_process.poll() is not None:
-                print("[Valamelyik folyamat varatlanul leallt.")
-                break
-    except KeyboardInterrupt:
-        print("\n Leállítás...")
-    finally:
-       
-        backend_process.terminate()
-        frontend_process.terminate()
-        print("Program zárva")
+        backend_process = subprocess.Popen(
+            [python_exe, "-m", "uvicorn", "backend.main:app", "--host", "127.0.0.1", "--port", "8000"]
+        )
+        print("Backend elindítva.")
+    except Exception as e:
+        print(f"HIBA: {e}")
+        return
 
-if __name__ == "Start":
-    main()
+    time.sleep(5) # Várakozás a szerverre
+
+    # 2. Frontend indítása
+    print("2. Frontend indítása")
+    try:
+        subprocess.run([python_exe, "-m", "streamlit", "run", "frontend/app.py"])
+    except KeyboardInterrupt:
+        print("\nLeállítás")
+    finally:
+        backend_process.terminate()
+
+# EZ A RÉSZ HIÁNYZOTT: Ez indítja el a fenti függvényt
+if __name__ == "__main__":
+    start_system()
