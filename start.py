@@ -8,7 +8,6 @@ def start_system():
     print(f"Rendszer indítása")
     print(f"Python: {python_exe}\n")
 
-    # 1. Backend indítása
     print("1. Backend indítása")
     try:
         backend_process = subprocess.Popen(
@@ -19,9 +18,8 @@ def start_system():
         print(f"HIBA: {e}")
         return
 
-    time.sleep(5) # Várakozás a szerverre
+    time.sleep(5) 
 
-    # 2. Frontend indítása
     print("2. Frontend indítása")
     try:
         subprocess.run([python_exe, "-m", "streamlit", "run", "frontend/app.py"])
@@ -30,6 +28,6 @@ def start_system():
     finally:
         backend_process.terminate()
 
-# EZ A RÉSZ HIÁNYZOTT: Ez indítja el a fenti függvényt
+
 if __name__ == "__main__":
     start_system()

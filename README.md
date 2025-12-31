@@ -1,5 +1,7 @@
 A rendszer célja, hogy manuális beavatkozás nélkül, folyamatosan gyűjtse a kriptovaluta piaci adatokat (általam megadott jelenlegi piaci érték alapján, nem pedig egy bróker api-ból gyűjti az adatokat), azokból statisztikát készítsen (átlag, minimum, maximum számítás), és az eredményeket egy könnyen értelmezhető, grafikonokkal ellátott webes felületen tálalja.
 
+A rendszer 10 másodpercenként frissíti a Bitcoin árfolyamát, tárolja az adatokat, és statisztikai elemzést készít az utolsó 1000 mérés alapján.
+
 Felépítés:
 
 1. Adatgyűjtő (Scraper): Egy háttérfolyamat, amely 10 másodpercenként lekéri a friss adatokat a Coinbase nyilvános felületéről.
